@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz : Bols tibétains</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; background: #f4f0f9; color: #333; }
+        h1 { color: #5a2a83; text-align: center; }
+        .question { margin-bottom: 1.5em; padding: 1em; background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .choices label { display: block; margin: 0.5em 0; }
+        button { padding: 10px 20px; background-color: #5a2a83; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .result { font-weight: bold; margin-top: 20px; text-align: center; }
+        #nextModule { display: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>Quiz : Bols tibétains</h1>
+<form id="quizForm"></form>
+<div style="text-align:center;">
+    <button onclick="submitQuiz()">Vérifier mes réponses</button>
+    <div class="result" id="result"></div>
+    <div id="nextModule">
+        <p>🎉 Bravo ! Tu peux maintenant passer au module suivant.</p>
+        <button onclick="alert('Le module suivant serait débloqué ici !')">Accéder au module suivant</button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {question: "À quoi servent principalement les bols tibétains en sonothérapie ?", choices: ["Décoration", "Émission de sons thérapeutiques", "Transport d'eau", "Méditation silencieuse uniquement"], answer: 1},
+    {question: "De quoi sont généralement composés les bols tibétains traditionnels ?", choices: ["Aluminium pur", "Un alliage de 7 métaux", "Pierre volcanique", "Céramique émaillée"], answer: 1},
+    {question: "Comment produit-on un son continu avec un bol tibétain ?", choices: ["En le frottant avec un maillet", "En le frappant violemment", "En soufflant dessus", "En le chauffant"], answer: 0},
+    {question: "Où peut-on poser un bol tibétain pour bénéficier de ses vibrations ?", choices: ["Sur une table uniquement", "Directement sur le corps", "Sur un coussin uniquement", "Dans un récipient d'eau"], answer: 1},
+    {question: "Quelle émotion est souvent apaisée par l'usage des bols tibétains ?", choices: ["La joie", "L'excitation", "L'anxiété", "La fierté"], answer: 2},
+    {question: "Quel est le meilleur environnement pour utiliser les bols tibétains ?", choices: ["En milieu bruyant", "Dans une salle lumineuse", "Dans un environnement calme et propice à la détente", "Sur un sol carrelé"], answer: 2},
+    {question: "Les bols tibétains peuvent-ils être utilisés pour harmoniser un lieu ?", choices: ["Oui", "Non", "Uniquement en extérieur", "Uniquement la nuit"], answer: 0},
+    {question: "Quel geste accompagne souvent l’utilisation des bols dans les soins ?", choices: ["Le martèlement", "La visualisation", "La respiration consciente", "L'acupression"], answer: 2},
+    {question: "Peut-on utiliser plusieurs bols pendant une séance ?", choices: ["Non, un seul suffit", "Oui, pour créer une harmonie", "Seulement deux", "Non, c’est déconseillé"], answer: 1},
+    {question: "Comment appelle-t-on le maillet utilisé pour faire chanter le bol ?", choices: ["Fouet", "Trompe", "Maillet ou bâton de friction", "Cale"], answer: 2},
+    {question: "Les bols peuvent-ils recharger des cristaux ?", choices: ["Non", "Oui", "Uniquement les améthystes", "Seulement en pleine lune"], answer: 1},
+    {question: "Une séance avec les bols peut-elle libérer des émotions ?", choices: ["Oui", "Non", "Uniquement chez les enfants", "Seulement sous hypnose"], answer: 0},
+    {question: "Les bols tibétains agissent surtout par :", choices: ["Contact physique", "Lumière", "Vibration sonore", "Odeur"], answer: 2},
+    {question: "Comment savoir à quel chakra correspond un bol ?", choices: ["Par sa taille", "Par sa couleur", "Par sa fréquence", "Par son poids"], answer: 2},
+    {question: "Quelle pratique complète bien l’usage des bols ?", choices: ["La marche rapide", "La sonothérapie avec d'autres instruments", "Le sport intensif", "La danse rituelle"], answer: 1},
+    {question: "Quel élément peut nuire à la qualité vibratoire d’un bol ?", choices: ["Le froid", "Le métal environnant", "La poussière", "Les traces d’humidité"], answer: 3},
+    {question: "Quelle est la durée typique d'une séance avec bols ?", choices: ["1 min", "10-30 min", "3 heures", "Toute la nuit"], answer: 1},
+    {question: "Quelle action faut-il faire après chaque séance ?", choices: ["Secouer le bol", "Le nettoyer", "Le tremper dans l’eau", "Changer de bol"], answer: 1},
+    {question: "Pourquoi choisir un bol plutôt qu’un autre ?", choices: ["Pour son esthétique", "Selon le son et la résonance", "Par sa marque", "Selon sa provenance uniquement"], answer: 1}
+];
+
+let selectedQuestions = [];
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function loadQuiz() {
+    shuffle(questions);
+    selectedQuestions = questions.slice(0, 10);
+    const form = document.getElementById('quizForm');
+    form.innerHTML = '';
+    selectedQuestions.forEach(function(q, index) {
+        let html = `<div class="question"><p><strong>Question ${index+1} :</strong> ${q.question}</p><div class="choices">`;
+        q.choices.forEach(function(choice, j) {
+            html += `<label><input type="radio" name="q${index}" value="${j}"> ${choice}</label>`;
+        });
+        html += `</div></div>`;
+        form.innerHTML += html;
+    });
+}
+
+function submitQuiz() {
+    let score = 0;
+    selectedQuestions.forEach(function(q, index) {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && parseInt(selected.value) === q.answer) {
+            score++;
+        }
+    });
+    const percent = Math.round((score / selectedQuestions.length) * 100);
+    let message = "⛔ Score insuffisant. Réessaie pour débloquer la suite.";
+    if (percent >= 80) {
+        message = "✅ Bravo ! Tu peux passer au module suivant.";
+        document.getElementById('nextModule').style.display = "block";
+    } else {
+        document.getElementById('nextModule').style.display = "none";
+    }
+    document.getElementById('result').innerText = `Score : ${percent}% – ${message}`;
+}
+
+loadQuiz();
+</script>
+
+</body>
+</html>
